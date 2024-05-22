@@ -5,8 +5,6 @@ import requests
 import logging
 import concurrent.futures
 import requests_cache
-import pandas as pd
-import pathlib
 import textwrap
 import google.generativeai as genai
 
