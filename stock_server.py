@@ -200,28 +200,20 @@ def get_stock_history():
         return jsonify({'error': str(e)}), 500
 
 
-
 conversation_history = []
 @app.route('/api/v1/gemini', methods=['POST'])
-def getGeminiResponse():
+def get_gemini_response():
 
     global conversation_history
 
     GOOGLE_API_KEY='AIzaSyDMUSbeGGwlL2A7IpESVD8ErqW50oFkyVM'
     genai.configure(api_key=GOOGLE_API_KEY)
-
     prompt = request.json.get('prompt')
-
     model = genai.GenerativeModel('gemini-pro')
-
     chat = model.start_chat(history=conversation_history)
 
-    conversation_history = (chat.history)
-
-    response = chat.send_message(prompt + ' , keep your answer up to 50 words');
-
+    response = chat.send_message(prompt)
     conversation_history = chat.history
-    logger.info("history: %s", chat.history)
 
     return jsonify(response.text), 200
 
