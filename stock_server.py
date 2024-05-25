@@ -277,7 +277,7 @@ def search_image():
         return jsonify({'error': 'No image found in search results'}), 404
 
     # Extract URL from the first image
-    image_url = image_results[1].get('src')
+    image_url = image_results[10].get('src')
 
     # Return image URL
     return jsonify({'image_url': image_url})
