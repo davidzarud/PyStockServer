@@ -39,7 +39,7 @@ def get_stock_price_by_ticker():
         info = stock.info
         company_name = info['longName']
         currency = info['currency']
-        yesterday_price = stock.history(period="2d")["Close"].iloc[-2]
+        yesterday_price = stock.history(period="5d")["Close"].iloc[-2]
         current_price = stock.history(period="1d")["Close"].iloc[-1]
 
         return jsonify({
@@ -133,7 +133,7 @@ def get_sp_500_stock_price():
             info = stocks.tickers[curr_ticker].info
             company_name = info['longName']
             currency = info['currency']
-            yesterday_price = stocks.tickers[curr_ticker].history(period="2d")["Close"].iloc[-2]
+            yesterday_price = stocks.tickers[curr_ticker].history(period="5d")["Close"].iloc[-2]
             current_price = stocks.tickers[curr_ticker].history(period="1d")["Close"].iloc[-1]
 
             results.append({
@@ -245,6 +245,42 @@ def get_gemini_response():
     conversation_history = chat.history
 
     return jsonify(response.text), 200
+
+
+@app.route('/api/v1/search-image', methods=['GET'])
+def search_image():
+    # Get search string from request body
+    search_term = request.args.get('query')
+    if not search_term:
+        return jsonify({'error': 'Missing search term'}), 400
+
+    # Build Google Image Search URL
+    url = f"https://www.google.com/search?q={search_term}&tbm=isch"
+
+    # Set headers to mimic a browser
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.19582"
+    }
+
+    # Send request and parse response
+    try:
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.content, 'lxml')
+    except Exception as e:
+        return jsonify({'error': f"Error fetching image: {str(e)}"}), 500
+
+    # Find all image elements
+    image_results = soup.find_all('img')
+
+    # Check if any images found
+    if not image_results:
+        return jsonify({'error': 'No image found in search results'}), 404
+
+    # Extract URL from the first image
+    image_url = image_results[1].get('src')
+
+    # Return image URL
+    return jsonify({'image_url': image_url})
 
 
 if __name__ == '__main__':
